@@ -15,6 +15,7 @@ scalacOptions ++= Seq(
 )
 
 libraryDependencies ++= Seq(
+  "io.spray" %  "spray-can" % "1.3.1",
   "org.clapper" % "grizzled-slf4j_2.10" % "1.0.1",
   "ch.qos.logback" % "logback-classic" % "1.0.5",
   "io.netty" % "netty" % "3.7.0.Final",

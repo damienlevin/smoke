@@ -1,20 +1,24 @@
 package smoke
 
+import akka.actor._
 import com.typesafe.config._
 import scala.concurrent.{ Future, ExecutionContext }
-import smoke.netty.NettyServer
 
 trait SmokeApp extends App with Smoke {
+  val smokeConfig = ConfigFactory.load().getConfig("smoke")
+  val system = ActorSystem("smoke", smokeConfig)
+
   override def delayedInit(body: ⇒ Unit) = {
     super[App].delayedInit(super[Smoke].delayedInit(body))
   }
 }
 
 trait Smoke extends DelayedInit {
+
+  val system: ActorSystem
+
   val smokeConfig: Config
   implicit val executionContext: ExecutionContext
-
-  private lazy val server = new NettyServer()(smokeConfig, executionContext)
 
   private var running = false
 
@@ -28,9 +32,7 @@ trait Smoke extends DelayedInit {
       t.getStackTrace.mkString("\n"))
   }
 
-  private var shutdownHooks = List(() ⇒ {
-    server.stop()
-  })
+  private var shutdownHooks = List(() ⇒ {})
 
   private def withErrorHandling(errorProne: smoke.Request ⇒ Future[Response]) = {
     case class RequestHandlerException(r: smoke.Request, e: Throwable) extends Exception("", e) {
@@ -77,30 +79,15 @@ trait Smoke extends DelayedInit {
   def fail(e: Exception) = Future.failed(e)
 
   def shutdown() {
-    if (running) {
-      running = false
-      shutdownHooks foreach { hook ⇒ hook() }
-    }
-  }
-
-  private[smoke] def init() {
-    try {
-      server.setApplication(application)
-      server.start()
-      running = true
-    } catch {
-      case e: Throwable ⇒
-        shutdownHooks foreach { hook ⇒ hook() }
-        throw e
-    }
-  }
-
-  def delayedInit(body: ⇒ Unit) = {
-    body
-    init()
+    shutdownHooks foreach { hook ⇒ hook() }
   }
 
   Runtime.getRuntime.addShutdownHook(new Thread(new Runnable {
     def run = shutdown()
   }))
+
+  def delayedInit(body: ⇒ Unit) = {
+    body
+    system.actorOf(Props(classOf[spray.Handler], application, smokeConfig))
+  }
 }

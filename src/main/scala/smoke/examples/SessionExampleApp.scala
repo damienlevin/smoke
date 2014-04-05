@@ -6,7 +6,6 @@ import scala.concurrent.ExecutionContext
 
 object SessionExampleApp extends SmokeApp {
   val executionContext = scala.concurrent.ExecutionContext.global
-  val smokeConfig = ConfigFactory.load().getConfig("smoke")
 
   val sessionManager = new SessionManager(smokeConfig.getString("session.secret"))
   import sessionManager._

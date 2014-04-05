@@ -5,7 +5,6 @@ import com.typesafe.config.ConfigFactory
 
 object StaticAssetsSmoke extends SmokeApp with StaticAssets {
   val publicFolder = "src/test/resources/public"
-  val smokeConfig = ConfigFactory.load().getConfig("smoke")
   val executionContext = scala.concurrent.ExecutionContext.global
 
   onRequest {

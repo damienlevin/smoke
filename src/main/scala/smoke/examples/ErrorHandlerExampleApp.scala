@@ -1,5 +1,6 @@
 package smoke.examples
 
+import akka.actor._
 import smoke._
 import com.typesafe.config.ConfigFactory
 import scala.concurrent.Future
@@ -14,6 +15,7 @@ object ErrorHandlerExampleApp extends App {
 }
 
 class ErrorHandlerExampleSmoke extends Smoke {
+  val system = ActorSystem("ErrorHandlerExampleSmoke", smokeConfig)
   val smokeConfig = ConfigFactory.load().getConfig("smoke")
   implicit val executionContext = scala.concurrent.ExecutionContext.global
 

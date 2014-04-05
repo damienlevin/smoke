@@ -1,5 +1,6 @@
 package smoke.examples
 
+import akka.actor._
 import smoke._
 import scala.concurrent._
 import com.typesafe.config.ConfigFactory
@@ -27,6 +28,8 @@ object Authenticated {
 
 class RestExampleSmoke extends Smoke with StaticAssets {
   val smokeConfig = ConfigFactory.load().getConfig("smoke")
+  val system = ActorSystem("BasicExampleSmoke", smokeConfig)
+
   implicit val executionContext = scala.concurrent.ExecutionContext.global
   import Authenticated.sessionMngr._
 

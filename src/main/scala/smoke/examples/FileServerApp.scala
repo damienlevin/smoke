@@ -1,5 +1,6 @@
 package smoke.examples
 
+import akka.actor._
 import smoke._
 import com.typesafe.config.ConfigFactory
 
@@ -8,7 +9,10 @@ object FileServerApp extends App {
 }
 
 class FileServerSmoke extends Smoke {
+
   val smokeConfig = ConfigFactory.load().getConfig("smoke")
+  val system = ActorSystem("FileServerSmoke", smokeConfig)
+
   val executionContext = scala.concurrent.ExecutionContext.global
 
   onRequest {

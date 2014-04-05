@@ -1,5 +1,6 @@
 package smoke.examples
 
+import akka.actor._
 import smoke._
 import com.typesafe.config._
 import scala.concurrent.ExecutionContext
@@ -15,6 +16,7 @@ object MultipleSmokeApp extends App {
 }
 
 class SampleSmoke(val smokeConfig: Config, val executionContext: ExecutionContext) extends Smoke {
+  val system = ActorSystem("SampleSmoke", smokeConfig)
   val ports = smokeConfig.getIntList("http.ports")
 
   onRequest {
